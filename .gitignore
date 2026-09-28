@@ -1,0 +1,8 @@
+
+.env
+
+.vs/
+.venv/
+bin/
+obj/
+__pycache__/

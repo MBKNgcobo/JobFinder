@@ -1,0 +1,121 @@
+services:
+
+  db:
+    image: postgres:18
+    container_name: jobfinder-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: jobfinder
+      POSTGRES_USER: jobfinder
+      POSTGRES_PASSWORD: jobfinder_dev_password
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - jobfinder_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U jobfinder -d jobfinder"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+
+  api:
+    build:
+      context: ./python-services
+      dockerfile: Dockerfile
+
+    container_name: jobfinder-api
+    restart: unless-stopped
+
+    environment:
+      DATABASE_URL: postgresql://jobfinder:jobfinder_dev_password@db:5432/jobfinder
+
+      LLM_BASE_URL: ${LLM_BASE_URL}
+      LLM_API_KEY: ${LLM_API_KEY}
+      LLM_MODEL: ${LLM_MODEL}
+      LLM_FALLBACK_MODELS: ${LLM_FALLBACK_MODELS}
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+
+  scraper:
+    build:
+      context: ./python-services
+      dockerfile: Dockerfile.scraper
+
+    container_name: jobfinder-scraper
+    restart: unless-stopped
+
+    environment:
+      DATABASE_URL: postgresql://jobfinder:jobfinder_dev_password@db:5432/jobfinder
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    volumes:
+      - ./python-services:/app
+
+    command:
+      [
+        "python",
+        "-m",
+        "app.scraper.docker_worker"
+      ]
+
+
+  web:
+    build:
+      context: .
+      dockerfile: JobFinder/Dockerfile
+
+    container_name: jobfinder-web
+    restart: unless-stopped
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+
+      ConnectionStrings__DefaultConnection: "Host=({DB_HOST:-db};Port=){DB_PORT:-5432};Database=({DB_NAME:-jobfinder};Username=){DB_USER:-jobfinder};Password=${DB_PASSWORD}"
+
+      Services__PythonApiBaseUrl: "http://api:8000/"
+
+    ports:
+      - "7176:8080"
+
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+
+volumes:
+  jobfinder_postgres_data:

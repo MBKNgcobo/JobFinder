@@ -1,0 +1,79 @@
+﻿@model IEnumerable<JobFinder.Models.Project>
+
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>My Projects</h1>
+
+        <a asp-action="Create"
+           asp-route-userId="1"
+           class="btn btn-primary">
+            Add Project
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            You haven't added any projects yet.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+
+            @foreach (var project in Model)
+            {
+                <div class="col-md-6 mb-4">
+
+                    <div class="card h-100">
+
+                        <div class="card-body">
+
+                            <h3>@project.Name</h3>
+
+                            @if (!string.IsNullOrWhiteSpace(project.Description))
+                            {
+                                <p>
+                                    @project.Description
+                                </p>
+                            }
+
+                            <div class="mb-3">
+
+                                @foreach (var projectSkill in project.ProjectSkills)
+                                {
+                                    <span class="badge bg-secondary me-1">
+                                        @projectSkill.Skill.Name
+                                    </span>
+                                }
+
+                            </div>
+
+                            <a asp-action="Details"
+                               asp-route-id="@project.Id"
+                               class="btn btn-outline-primary">
+                                View
+                            </a>
+
+                            <a asp-action="Edit"
+                               asp-route-id="@project.Id"
+                               class="btn btn-outline-secondary">
+                                Edit
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

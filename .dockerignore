@@ -1,0 +1,15 @@
+.git
+.gitignore
+.vs
+.vscode
+
+**/bin/
+**/obj/
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+**/*.pyo
+
+python-services/.venv/
+python-services/.env/
+

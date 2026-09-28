@@ -1,0 +1,360 @@
+﻿@model JobFinder.Models.ViewModels.JobSearchViewModel
+
+@{
+ViewData["Title"] = "Jobs";
+
+
+var search = ViewBag.Search as string;
+var location = ViewBag.Location as string;
+var source = ViewBag.Source as string;
+var minMatchScore = ViewBag.MinMatchScore;
+
+var currentPage = ViewBag.CurrentPage ?? 1;
+var totalPages = ViewBag.TotalPages ?? 0;
+var pageSize = ViewBag.PageSize ?? 10;
+var totalJobs = ViewBag.TotalJobs ?? 0;
+
+var hasResults = ViewBag.HasResults ?? (Model.Jobs != null && Model.Jobs.Any());
+var emptyMessage = ViewBag.EmptyMessage as string
+                   ?? "No jobs matched your current search and filters.";
+
+
+}
+
+<div class="container mt-4">
+
+```
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>Job Opportunities</h1>
+
+        @if (totalJobs > 0)
+        {
+            <p class="text-muted mb-0">
+                @totalJobs job@(totalJobs == 1 ? "" : "s") found
+            </p>
+        }
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        Add Job
+    </a>
+</div>
+
+<!-- Search + Filters -->
+<form asp-action="Index" method="get" class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <!-- Keyword -->
+            <div class="col-md-6">
+                <label for="search" class="form-label">
+                    Keyword
+                </label>
+
+                <input type="text"
+                       id="search"
+                       name="search"
+                       value="@search"
+                       class="form-control"
+                       placeholder="Search jobs, descriptions or companies..." />
+            </div>
+
+            <!-- Location -->
+            <div class="col-md-6">
+                <label for="location" class="form-label">
+                    Location
+                </label>
+
+                <input type="text"
+                       id="location"
+                       name="location"
+                       value="@location"
+                       class="form-control"
+                       placeholder="e.g. Johannesburg, Cape Town, Remote..." />
+            </div>
+
+            <!-- Source -->
+            <div class="col-md-6">
+                <label for="source" class="form-label">
+                    Source
+                </label>
+
+                <input type="text"
+                       id="source"
+                       name="source"
+                       value="@source"
+                       class="form-control"
+                       placeholder="e.g. PNet, arbeitnow.com..." />
+            </div>
+
+            <!-- Match Score -->
+            <div class="col-md-6">
+                <label for="minMatchScore" class="form-label">
+                    Minimum Match Score
+                </label>
+
+                <div class="input-group">
+                    <input type="number"
+                           id="minMatchScore"
+                           name="minMatchScore"
+                           value="@minMatchScore"
+                           class="form-control"
+                           min="0"
+                           max="100"
+                           step="1"
+                           placeholder="0 - 100" />
+
+                    <span class="input-group-text">%</span>
+                </div>
+
+                <div class="form-text">
+                    Only show jobs matching at least this percentage.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2 mt-4">
+
+            <button type="submit" class="btn btn-dark">
+                Search & Filter
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                Clear Filters
+            </a>
+
+        </div>
+
+    </div>
+</form>
+
+<!-- Empty Result -->
+@if (!hasResults)
+{
+    <div class="alert alert-info text-center py-4">
+        <h5 class="mb-2">No jobs found</h5>
+        <p class="mb-3">
+            @emptyMessage
+        </p>
+
+        <a asp-action="Index"
+           class="btn btn-outline-primary">
+            Clear Filters
+        </a>
+    </div>
+}
+else
+{
+    <!-- Job Results -->
+    <div class="row">
+
+        @foreach (var job in Model.Jobs)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body d-flex flex-column">
+
+                        <!-- Title -->
+                        <h5 class="card-title">
+                            @job.Title
+                        </h5>
+
+                        <!-- Company -->
+                        @if (job.Company != null)
+                        {
+                            <h6 class="card-subtitle mb-3 text-muted">
+                                @job.Company.Name
+                            </h6>
+                        }
+
+                        <!-- Description -->
+                        <p class="card-text">
+                            @if (!string.IsNullOrWhiteSpace(job.Description))
+                            {
+                                @(job.Description.Length > 150
+                                    ? job.Description.Substring(0, 150) + "..."
+                                    : job.Description)
+                            }
+                            else
+                            {
+                                <span class="text-muted">
+                                    No description available.
+                                </span>
+                            }
+                        </p>
+
+                        <!-- Location -->
+                        @if (!string.IsNullOrWhiteSpace(job.Location))
+                        {
+                            <p class="text-muted mb-2">
+                                <strong>Location:</strong>
+                                @job.Location
+                            </p>
+                        }
+
+                        <!-- Source -->
+                        @if (!string.IsNullOrWhiteSpace(job.Source))
+                        {
+                            <p class="text-muted mb-3">
+                                <strong>Source:</strong>
+                                @job.Source
+                            </p>
+                        }
+
+                        <!-- Skills -->
+                        @if (job.JobSkills != null && job.JobSkills.Any())
+                        {
+                            <div class="mb-3">
+
+                                @foreach (var jobSkill in job.JobSkills)
+                                {
+                                    @if (jobSkill.Skill != null)
+                                    {
+                                        <span class="badge bg-secondary me-1 mb-1">
+                                            @jobSkill.Skill.Name
+                                        </span>
+                                    }
+                                }
+
+                            </div>
+                        }
+
+                        <!-- Buttons -->
+                        <div class="mt-auto">
+
+                            <a asp-action="Details"
+                               asp-route-id="@job.Id"
+                               class="btn btn-outline-primary">
+                                View Job
+                            </a>
+
+                            <a asp-action="Edit"
+                               asp-route-id="@job.Id"
+                               class="btn btn-outline-secondary">
+                                Edit
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="card-footer text-muted">
+                        <div>
+                            <strong>Posted:</strong>
+                            @(job.PostedDate?.ToString("dd MMM yyyy")
+                                ?? "Date not available")
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Job pagination" class="mt-4 mb-5">
+
+            <ul class="pagination justify-content-center">
+
+                <!-- Previous -->
+                <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+
+                    @if (currentPage > 1)
+                    {
+                        <a class="page-link"
+                           asp-controller="Jobs"
+                           asp-action="Index"
+                           asp-route-search="@search"
+                           asp-route-location="@location"
+                           asp-route-source="@source"
+                           asp-route-minMatchScore="@minMatchScore"
+                           asp-route-page="@(currentPage - 1)"
+                           asp-route-pageSize="@pageSize">
+                            Previous
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="page-link">
+                            Previous
+                        </span>
+                    }
+
+                </li>
+
+                <!-- Page Numbers -->
+                    @for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == currentPage ? "active" : "")">
+
+                            @if (pageNumber == currentPage)
+                            {
+                                <span class="page-link">
+                                    @pageNumber
+                                </span>
+                            }
+                            else
+                            {
+                                <a class="page-link"
+                                   asp-controller="Jobs"
+                                   asp-action="Index"
+                                   asp-route-search="@search"
+                                   asp-route-location="@location"
+                                   asp-route-source="@source"
+                                   asp-route-minMatchScore="@minMatchScore"
+                                   asp-route-page="@pageNumber"
+                                   asp-route-pageSize="@pageSize">
+                                    @pageNumber
+                                </a>
+                            }
+
+                        </li>
+                    }
+
+                <!-- Next -->
+                <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+
+                    @if (currentPage < totalPages)
+                    {
+                        <a class="page-link"
+                           asp-controller="Jobs"
+                           asp-action="Index"
+                           asp-route-search="@search"
+                           asp-route-location="@location"
+                           asp-route-source="@source"
+                           asp-route-minMatchScore="@minMatchScore"
+                           asp-route-page="@(currentPage + 1)"
+                           asp-route-pageSize="@pageSize">
+                            Next
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="page-link">
+                            Next
+                        </span>
+                    }
+
+                </li>
+
+            </ul>
+
+        </nav>
+    }
+}
+
+
+</div>

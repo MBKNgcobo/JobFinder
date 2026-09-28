@@ -1,0 +1,220 @@
+﻿@model IEnumerable<JobFinder.Models.Application>
+
+@{
+    ViewData["Title"] = "My Applications";
+
+    var applications = Model
+        .OrderByDescending(a => a.UpdatedAt)
+        .ToList();
+
+    var total = applications.Count;
+    var applied = applications.Count(a => a.Status == "Applied");
+    var drafts = applications.Count(a => a.Status == "Draft");
+}
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">My Applications</h1>
+            <p class="text-muted mb-0">
+                Track your applications and manage your application packages.
+            </p>
+        </div>
+
+        <a asp-controller="Jobs"
+           asp-action="Index"
+           class="btn btn-primary">
+            Browse Jobs
+        </a>
+    </div>
+
+    <!-- STATS -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">
+                        Total Applications
+                    </div>
+
+                    <div class="display-6 fw-bold">
+                        @total
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">
+                        Applied
+                    </div>
+
+                    <div class="display-6 fw-bold text-success">
+                        @applied
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">
+                        Drafts
+                    </div>
+
+                    <div class="display-6 fw-bold text-warning">
+                        @drafts
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- APPLICATIONS -->
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Application History</h5>
+        </div>
+
+        <div class="card-body p-0">
+
+            @if (!applications.Any())
+            {
+                <div class="text-center py-5">
+
+                    <h5>No applications yet</h5>
+
+                    <p class="text-muted">
+                        Find a job and create your first application.
+                    </p>
+
+                    <a asp-controller="Jobs"
+                       asp-action="Index"
+                       class="btn btn-primary">
+                        Browse Jobs
+                    </a>
+
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>Position</th>
+                                <th>Company</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Updated</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var application in applications)
+                            {
+                                <tr>
+
+                                    <!-- JOB -->
+                                    <td>
+                                        <div class="fw-semibold">
+                                            @(application.Job?.Title
+                                                                                ?? "Unknown Position")
+                                                                                                  </div>
+                                                                                              </td>
+
+                                    <!-- COMPANY -->
+                                    <td>
+                                        @(application.Job?.Company?.Name
+                                                                        ?? "Unknown Company")
+                                                                                         </td>
+
+                                    <!-- LOCATION -->
+                                    <td>
+                                        @(application.Job?.Location
+                                                                        ?? "Not specified")
+                            </td>
+
+                                    <!-- STATUS -->
+                                    <td>
+
+                                @if (application.Status == "Applied")
+                                        {
+                                            <span class="badge bg-success">
+                                                Applied
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Draft
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <!-- UPDATED -->
+                                    <td>
+                                        <span class="text-muted">
+                                            @application.UpdatedAt
+                                            .ToLocalTime()
+                                            .ToString("dd MMM yyyy")
+                                        </span>
+                                    </td>
+
+                                    <!-- ACTIONS -->
+                                    <td class="text-end">
+
+                                        <div class="d-flex justify-content-end gap-2">
+
+                                            <a asp-controller="Applications"
+                                               asp-action="Details"
+                                               asp-route-id="@application.Id"
+                                               class="btn btn-sm btn-outline-primary">
+                                                View
+                                            </a>
+
+                                            @if (!string.IsNullOrWhiteSpace(
+                                                                                application.Job?.SourceUrl))
+                                            {
+                                                <a href="@application.Job.SourceUrl"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer"
+                                                   class="btn btn-sm btn-outline-success">
+                                                    Job ↗
+                                                </a>
+                                            }
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,113 @@
+services:
+
+  db:
+    image: postgres:18
+    container_name: jobfinder-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: jobfinder
+      POSTGRES_USER: jobfinder
+      POSTGRES_PASSWORD: jobfinder_dev_password
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - jobfinder_postgres_data:/var/lib/postgresql
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U jobfinder -d jobfinder"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+
+  api:
+    build:
+      context: ./python-services
+      dockerfile: Dockerfile
+
+    container_name: jobfinder-api
+    restart: unless-stopped
+
+    env_file:
+      - ./python-services/.env
+
+    environment:
+      DATABASE_URL: postgresql://jobfinder:jobfinder_dev_password@db:5432/jobfinder
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+
+  scraper:
+    build:
+      context: ./python-services
+      dockerfile: Dockerfile.scraper
+
+    container_name: jobfinder-scraper
+    restart: unless-stopped
+
+    env_file:
+      - ./python-services/.env
+
+    environment:
+      DATABASE_URL: postgresql://jobfinder:jobfinder_dev_password@db:5432/jobfinder
+      SCRAPER_INTERVAL_MINUTES: 360
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    shm_size: "1gb"
+
+
+  web:
+    build:
+      context: .
+      dockerfile: JobFinder/Dockerfile
+
+    container_name: jobfinder-web
+    restart: unless-stopped
+
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=jobfinder;Username=jobfinder;Password=jobfinder_dev_password"
+      Services__PythonApiBaseUrl: "http://api:8000/"
+
+    ports:
+      - "7176:8080"
+
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+
+volumes:
+  jobfinder_postgres_data:

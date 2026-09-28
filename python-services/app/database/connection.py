@@ -1,0 +1,24 @@
+import os
+
+import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://jobfinder:jobfinder@db:5432/jobfinder",
+)
+
+# Support SQLAlchemy-style URLs if DATABASE_URL is currently using one.
+if DATABASE_URL.startswith("postgresql+psycopg2://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql+psycopg2://",
+        "postgresql://",
+        1,
+    )
+
+
+def get_connection():
+    return psycopg2.connect(DATABASE_URL)

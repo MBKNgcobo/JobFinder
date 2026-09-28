@@ -1,0 +1,733 @@
+﻿@model JobFinder.Models.ViewModels.ApplicationDetailsViewModel
+
+@{
+    ViewData["Title"] = "Application Details";
+
+    var isApplied =
+        string.Equals(
+            Model.Status,
+            "Applied",
+            StringComparison.OrdinalIgnoreCase);
+
+    var hasGeneratedApplication =
+        !string.IsNullOrWhiteSpace(
+            Model.GeneratedCoverLetter);
+}
+
+<div class="container py-4">
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between
+                align-items-md-center
+                gap-3 mb-4">
+
+        <div>
+
+            <div class="d-flex
+                        align-items-center
+                        flex-wrap
+                        gap-2 mb-2">
+
+                <h1 class="fw-bold mb-0">
+                    Application
+                </h1>
+
+                @if (isApplied)
+                {
+                    <span class="badge bg-success px-3 py-2">
+                        ✓ Applied
+                    </span>
+                }
+                else if (hasGeneratedApplication)
+                {
+                    <span class="badge bg-primary px-3 py-2">
+                        Ready for Review
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary px-3 py-2">
+                        Draft
+                    </span>
+                }
+
+            </div>
+
+            <p class="text-muted mb-0">
+                Application #@Model.Id
+            </p>
+
+        </div>
+
+        <a asp-controller="Applications"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+
+            ← Applications
+
+        </a>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- JOB INFORMATION -->
+    <!-- ========================================================= -->
+    @if (Model.Job != null)
+    {
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-body p-4">
+
+                <div class="row g-4 align-items-center">
+
+                    <div class="col-lg-8">
+
+                        <small class="text-muted d-block mb-1">
+                            Job
+                        </small>
+
+                        <h2 class="fw-bold mb-1">
+                            @Model.Job.Title
+                        </h2>
+
+                        <h5 class="text-muted mb-3">
+                            @(Model.Job.Company?.Name
+                                                    ?? "Unknown Company")
+                    </h5>
+
+                        <div class="d-flex
+                                        flex-wrap
+                                        gap-2">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                                                Model.Job.Location))
+                            {
+                                <span class="badge bg-light text-dark border">
+                                    📍 @Model.Job.Location
+                                </span>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(
+                                                    Model.Job.EmploymentType))
+                            {
+                                <span class="badge bg-light text-dark border">
+                                    💼 @Model.Job.EmploymentType
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4 text-lg-end">
+
+                        @if (!string.IsNullOrWhiteSpace(
+                                            Model.Job.SourceUrl))
+                        {
+                            <a href="@Model.Job.SourceUrl"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-outline-success">
+
+                                View Original Job ↗
+
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- STATUS INFORMATION -->
+    <!-- ========================================================= -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body p-4">
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Status
+                    </small>
+
+                    @if (isApplied)
+                    {
+                        <strong class="text-success">
+                            Applied
+                        </strong>
+                    }
+                    else if (hasGeneratedApplication)
+                    {
+                        <strong class="text-primary">
+                            Generated — Awaiting Approval
+                        </strong>
+                    }
+                    else
+                    {
+                        <strong>
+                            Draft
+                        </strong>
+                    }
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Last Updated
+                    </small>
+
+                    <strong>
+                        @Model.UpdatedAt
+                        .ToLocalTime()
+                        .ToString("dd MMM yyyy HH:mm")
+                    </strong>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Applied At
+                    </small>
+
+                    @if (Model.AppliedAt.HasValue)
+                    {
+                        <strong>
+                            @Model.AppliedAt.Value
+                            .ToLocalTime()
+                            .ToString("dd MMM yyyy HH:mm")
+                        </strong>
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            Not applied yet
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- AI APPLICATION PREPARATION -->
+    <!-- ========================================================= -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <h4 class="fw-bold mb-1">
+                AI Application Preparation
+            </h4>
+
+            <p class="text-muted mb-0">
+                JobFinder analyses the role, matches your skills,
+                selects relevant projects and prepares your
+                application materials.
+            </p>
+
+        </div>
+
+
+        <div class="card-body p-4">
+
+            @if (!hasGeneratedApplication)
+            {
+                <!-- ================================================= -->
+                <!-- NOT GENERATED -->
+                <!-- ================================================= -->
+
+                <div class="text-center py-5">
+
+                    <div class="mb-3">
+                        <span style="font-size: 3rem;">
+                            🤖
+                        </span>
+                    </div>
+
+                    <h4 class="fw-bold">
+                        Application not generated yet
+                    </h4>
+
+                    <p class="text-muted mx-auto mb-4"
+                       style="max-width: 650px;">
+
+                        JobFinder will analyse the job requirements,
+                        compare them with your profile, identify
+                        useful portfolio projects and prepare
+                        a tailored application.
+
+                    </p>
+
+                    <form asp-controller="Applications"
+                          asp-action="Generate"
+                          asp-route-id="@Model.Id"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-primary btn-lg px-4">
+
+                            Generate Application
+
+                        </button>
+
+                    </form>
+
+                </div>
+            }
+            else
+            {
+                <!-- ================================================= -->
+                <!-- GENERATED -->
+                <!-- ================================================= -->
+                <!-- MATCHED SKILLS -->
+
+                <div class="mb-5">
+
+                    <div class="d-flex
+                                    justify-content-between
+                                    align-items-center
+                                    mb-3">
+
+                        <h5 class="fw-bold mb-0">
+                            Matched Skills
+                        </h5>
+
+                        @if (Model.MatchedSkills.Any())
+                        {
+                            <span class="badge bg-success">
+                                @Model.MatchedSkills.Count matched
+                            </span>
+                        }
+
+                    </div>
+
+                    @if (Model.MatchedSkills.Any())
+                    {
+                        <div>
+
+                            @foreach (
+                                                var skill
+                                                in Model.MatchedSkills)
+                            {
+                                <span class="badge
+                                                         bg-success
+                                                         me-1
+                                                         mb-2
+                                                         px-3
+                                                         py-2">
+
+                                    @skill
+
+                                </span>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border mb-0">
+                            No directly matched skills were identified.
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- RECOMMENDED PROJECTS -->
+
+                <div class="mb-5">
+
+                    <h5 class="fw-bold mb-3">
+                        Recommended Projects
+                    </h5>
+
+                    @if (Model.RecommendedProjects.Any())
+                    {
+                        <div class="row g-3">
+
+                            @foreach (
+                                                var project
+                                                in Model.RecommendedProjects)
+                            {
+                                <div class="col-lg-6">
+
+                                    <div class="card
+                                                            h-100
+                                                            border
+                                                            shadow-sm">
+
+                                        <div class="card-body">
+
+                                            <h6 class="fw-bold">
+                                                @project.Name
+                                            </h6>
+
+                                            <p class="text-muted mb-0">
+                                                @project.Reason
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border mb-0">
+                            No specific projects were recommended.
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- CV CHANGES -->
+
+                <div class="mb-5">
+
+                    <h5 class="fw-bold mb-3">
+                        Suggested CV Changes
+                    </h5>
+
+                    @if (Model.CvChanges.Any())
+                    {
+                        <div class="list-group">
+
+                            @foreach (
+                                                var change
+                                                in Model.CvChanges)
+                            {
+                                <div class="list-group-item">
+
+                                    <div class="d-flex gap-2">
+
+                                        <span class="text-primary">
+                                            •
+                                        </span>
+
+                                        <span>
+                                            @change
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border mb-0">
+                            No specific CV changes were generated.
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- COVER LETTER -->
+
+                <div class="mb-4">
+
+                    <h5 class="fw-bold mb-3">
+                        Cover Letter
+                    </h5>
+
+                    <div class="border rounded
+                                    p-4
+                                    bg-light">
+
+                        <div style="white-space: pre-line;">
+
+                            @Model.GeneratedCoverLetter
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @if (Model.GeneratedAt.HasValue)
+                {
+                    <div class="text-muted small">
+                        Generated on
+                        @Model.GeneratedAt.Value
+                        .ToLocalTime()
+                        .ToString("dd MMM yyyy HH:mm")
+                    </div>
+                }
+
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- GENERATED DOCUMENTS -->
+    <!-- ========================================================= -->
+    @if (Model.Documents.Any())
+    {
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-header bg-white border-0 p-4">
+
+                <h5 class="fw-bold mb-1">
+                    Application Documents
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Download the generated application files.
+                </p>
+
+            </div>
+
+            <div class="card-body p-4">
+
+                <div class="list-group">
+
+                    @foreach (
+                                    var document
+                                    in Model.Documents)
+                    {
+                        <div class="list-group-item
+                                            d-flex
+                                            flex-column
+                                            flex-md-row
+                                            justify-content-between
+                                            align-items-md-center
+                                            gap-3">
+
+                            <div>
+
+                                <div class="fw-bold">
+
+                                    @if (document.DocumentType
+                                                                == "CV")
+                                    {
+                                        <span>
+                                            Tailored CV
+                                        </span>
+                                    }
+                                    else if (
+                                    document.DocumentType
+                                    == "CoverLetter")
+                                    {
+                                        <span>
+                                            Cover Letter
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            @document.DocumentType
+                                        </span>
+                                    }
+
+                                    <span class="text-muted ms-2">
+                                        v@(document.Version)
+                                    </span>
+
+                                </div>
+
+                                <div class="small text-muted">
+
+                                    Created
+                                    @document.CreatedAt
+                                    .ToLocalTime()
+                                    .ToString(
+                                    "dd MMM yyyy HH:mm")
+
+                                </div>
+
+                            </div>
+
+
+                            <a asp-controller="Applications"
+                               asp-action="DownloadDocument"
+                               asp-route-applicationId="@Model.Id"
+                               asp-route-documentId="@document.Id"
+                               class="btn btn-outline-primary">
+
+                                Download DOCX
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- APPROVAL / APPLIED -->
+    <!-- ========================================================= -->
+    @if (hasGeneratedApplication)
+    {
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-body p-4">
+
+                @if (isApplied)
+                {
+                    <!-- ============================================= -->
+                    <!-- ALREADY APPLIED -->
+                    <!-- ============================================= -->
+
+                    <div class="alert alert-success mb-0">
+
+                        <h5 class="alert-heading fw-bold">
+                            ✓ Application marked as applied
+                        </h5>
+
+                        <p class="mb-2">
+
+                            You approved the generated application
+                            and marked it as applied.
+
+                        </p>
+
+                        @if (Model.AppliedAt.HasValue)
+                        {
+                            <small>
+
+                                Applied on
+                                @Model.AppliedAt.Value
+                                .ToLocalTime()
+                                .ToString(
+                                "dd MMMM yyyy HH:mm")
+
+                            </small>
+                        }
+
+                    </div>
+                }
+                else
+                {
+                    <!-- ============================================= -->
+                    <!-- READY TO APPLY -->
+                    <!-- ============================================= -->
+
+                    <div class="d-flex
+                                        flex-column
+                                        flex-lg-row
+                                        justify-content-between
+                                        align-items-lg-center
+                                        gap-4">
+
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+                                Ready to Apply?
+                            </h5>
+
+                            <p class="text-muted mb-0">
+
+                                Review the generated content
+                                and downloaded documents first.
+                                When you are satisfied, mark
+                                this application as applied.
+
+                            </p>
+
+                        </div>
+
+
+                        <form asp-controller="Applications"
+                              asp-action="Approve"
+                              asp-route-id="@Model.Id"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-success btn-lg px-4">
+
+                                ✓ Approve &amp; Mark as Applied
+
+                            </button>
+
+                        </form>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- FOOTER NAVIGATION -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex
+                flex-column
+                flex-md-row
+                gap-2
+                mt-4">
+
+        <a asp-controller="Applications"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+
+            ← Back to Applications
+
+        </a>
+
+        @if (Model.Job != null)
+        {
+            <a asp-controller="Jobs"
+               asp-action="Details"
+               asp-route-id="@Model.Job.Id"
+               class="btn btn-outline-primary">
+
+                View Job
+
+            </a>
+        }
+
+    </div>
+
+</div>

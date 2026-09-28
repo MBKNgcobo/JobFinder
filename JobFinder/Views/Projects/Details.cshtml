@@ -1,0 +1,109 @@
+﻿@model JobFinder.Models.Project
+
+@{
+    ViewData["Title"] = "Project Details";
+}
+
+<div class="container mt-4">
+
+    <h1>@Model.Name</h1>
+
+    <div class="card">
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <h5>Description</h5>
+
+                <p>
+                    @Model.Description
+                </p>
+            }
+
+            <h5>Skills</h5>
+
+            <div class="mb-3">
+
+                @foreach (var projectSkill in Model.ProjectSkills)
+                {
+                    <span class="badge bg-secondary me-1">
+                        @projectSkill.Skill.Name
+                    </span>
+                }
+
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.GitHubUrl))
+            {
+                <p>
+                    <strong>GitHub:</strong>
+
+                    <a href="@Model.GitHubUrl"
+                       target="_blank">
+                        @Model.GitHubUrl
+                    </a>
+                </p>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.LiveUrl))
+            {
+                <p>
+                    <strong>Live:</strong>
+
+                    <a href="@Model.LiveUrl"
+                       target="_blank">
+                        @Model.LiveUrl
+                    </a>
+                </p>
+            }
+
+            <p>
+                <strong>Start:</strong>
+                @Model.StartDate?.ToString("yyyy-MM-dd")
+            </p>
+
+            <p>
+                <strong>End:</strong>
+                @Model.EndDate?.ToString("yyyy-MM-dd")
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="mt-3">
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.Id"
+           class="btn btn-primary">
+            Edit
+        </a>
+
+        <a asp-action="Index"
+           asp-route-userId="@Model.UserId"
+           class="btn btn-secondary">
+            Back
+        </a>
+
+    </div>
+
+    <form asp-action="Delete"
+          method="post"
+          class="mt-3">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden"
+               name="id"
+               value="@Model.Id" />
+
+        <button type="submit"
+                class="btn btn-danger"
+                onclick="return confirm('Delete this project?');">
+            Delete
+        </button>
+
+    </form>
+
+</div>

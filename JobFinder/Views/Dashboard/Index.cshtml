@@ -1,0 +1,600 @@
+﻿@model JobFinder.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container py-4">
+
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between
+                align-items-md-center
+                gap-3 mb-4">
+
+        <div>
+            <h1 class="fw-bold mb-1">
+                JobFinder
+            </h1>
+
+            <p class="text-muted mb-0">
+                Find relevant jobs and prepare stronger applications with AI.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-controller="Jobs"
+               asp-action="Index"
+               class="btn btn-primary">
+                Browse Jobs
+            </a>
+
+            <a asp-controller="Applications"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                My Applications
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- STATISTICS -->
+    <!-- ========================= -->
+
+    <div class="row g-3 mb-4">
+
+        <!-- Recommended Jobs -->
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Recommended Jobs
+                    </p>
+
+                    <h2 class="fw-bold mb-0">
+                        @Model.Recommendations.Count
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Applications -->
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Applications
+                    </p>
+
+                    <h2 class="fw-bold mb-0">
+                        @Model.TotalApplications
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Submitted -->
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Applications Submitted
+                    </p>
+
+                    <h2 class="fw-bold mb-0">
+                        @Model.AppliedApplications
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- RECOMMENDED JOBS -->
+    <!-- ========================= -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <div class="d-flex
+                        justify-content-between
+                        align-items-center">
+
+                <div>
+
+                    <h4 class="fw-bold mb-1">
+                        Recommended Jobs
+                    </h4>
+
+                    <p class="text-muted mb-0">
+                        Jobs matched against your skills and experience.
+                    </p>
+
+                </div>
+
+                <a asp-controller="Jobs"
+                   asp-action="Index"
+                   class="btn btn-sm btn-outline-primary">
+                    View all
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body px-4">
+
+            @if (!Model.Recommendations.Any())
+            {
+                <div class="alert alert-info">
+
+                    No job recommendations are available yet.
+
+                    Add skills to your profile to improve recommendations.
+
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+
+                    @foreach (var job in Model.Recommendations)
+                    {
+                        <div class="col-lg-6">
+
+                            <div class="card h-100 border shadow-sm">
+
+                                <div class="card-body">
+
+                                    <!-- Job title -->
+
+                                    <div class="d-flex
+                                                        justify-content-between
+                                                        gap-3">
+
+                                        <div>
+
+                                            <h5 class="fw-bold mb-1">
+                                                @job.Title
+                                            </h5>
+
+                                            <p class="text-muted mb-2">
+                                                @job.Company
+                                            </p>
+
+                                        </div>
+
+
+                                        <!-- Match score -->
+
+                                        <span class="badge
+                                                             bg-success
+                                                             align-self-start">
+
+                                            @job.MatchScore% Match
+
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- Location -->
+                                    @if (!string.IsNullOrWhiteSpace(job.Location))
+                                    {
+                                        <div class="small text-muted mb-1">
+
+                                            📍 @job.Location
+
+                                        </div>
+                                    }
+
+
+                                    <!-- Employment -->
+                                    @if (!string.IsNullOrWhiteSpace(job.EmploymentType))
+                                    {
+                                        <div class="small text-muted mb-3">
+
+                                            💼 @job.EmploymentType
+
+                                        </div>
+                                    }
+
+
+                                    <!-- Matched skills -->
+                                    @if (job.MatchedRequiredSkills.Any())
+                                    {
+                                        <div class="mb-3">
+
+                                            <div class="small fw-semibold mb-2">
+                                                Matched Skills
+                                            </div>
+
+                                            @foreach (var skill in job.MatchedRequiredSkills)
+                                            {
+                                                <span class="badge
+                                                                             bg-primary
+                                                                             me-1
+                                                                             mb-1">
+
+                                                    @skill
+
+                                                </span>
+                                            }
+
+                                        </div>
+                                    }
+
+
+                                    <!-- Missing skills -->
+                                    @if (job.MissingRequiredSkills.Any())
+                                    {
+                                        <div>
+
+                                            <div class="small fw-semibold mb-2">
+                                                Skills to Develop
+                                            </div>
+
+                                            @foreach (var skill in job.MissingRequiredSkills)
+                                            {
+                                                <span class="badge
+                                                                             bg-light
+                                                                             text-dark
+                                                                             border
+                                                                             me-1
+                                                                             mb-1">
+
+                                                    @skill
+
+                                                </span>
+                                            }
+
+                                        </div>
+                                    }
+
+                                </div>
+
+
+                                <!-- Job actions -->
+
+                                <div class="card-footer
+                                                    bg-white
+                                                    border-0
+                                                    pb-3">
+
+                                    <div class="d-flex gap-2">
+
+                                        <!-- View Job -->
+
+                                        <a asp-controller="Jobs"
+                                           asp-action="Details"
+                                           asp-route-id="@job.JobId"
+                                           class="btn btn-outline-primary">
+
+                                            View Job
+
+                                        </a>
+
+
+                                        <!-- Prepare Application -->
+
+                                        <form asp-controller="Applications"
+                                              asp-action="Apply"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="jobId"
+                                                   value="@job.JobId" />
+
+                                            <button type="submit"
+                                                    class="btn btn-primary">
+
+                                                Prepare Application
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- APPLICATIONS -->
+    <!-- ========================= -->
+
+    <div class="card border-0 shadow-sm">
+
+        <!-- Applications header -->
+
+        <div class="card-header
+                    bg-white
+                    border-0
+                    pt-4
+                    px-4">
+
+            <div class="d-flex
+                        justify-content-between
+                        align-items-center">
+
+                <div>
+
+                    <h4 class="fw-bold mb-1">
+                        Recent Applications
+                    </h4>
+
+                    <p class="text-muted mb-0">
+                        Track your applications and continue to the original job listing.
+                    </p>
+
+                </div>
+
+                <a asp-controller="Applications"
+                   asp-action="Index"
+                   class="btn btn-sm btn-outline-primary">
+
+                    View all
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Applications body -->
+
+        <div class="card-body p-0">
+
+            @if (!Model.Applications.Any())
+            {
+                <div class="p-4">
+
+                    <div class="alert alert-info mb-0">
+
+                        You have not created any applications yet.
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover
+                                      align-middle
+                                      mb-0">
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th class="ps-4">
+                                    Position
+                                </th>
+
+                                <th>
+                                    Company
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Updated
+                                </th>
+
+                                <th class="pe-4 text-end">
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach (var application in Model.Applications
+                                                    .OrderByDescending(a => a.UpdatedAt)
+                                                    .Take(5))
+                            {
+                                <tr>
+
+                                    <!-- Position -->
+
+                                    <td class="ps-4">
+
+                                        <div class="fw-semibold">
+
+                                            @application.Job?.Title
+
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(
+                                                                        application.Job?.Location))
+                                        {
+                                            <small class="text-muted">
+
+                                                📍 @application.Job.Location
+
+                                            </small>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- Company -->
+
+                                    <td>
+
+                                        @application.Job?.Company?.Name
+
+                                    </td>
+
+
+                                    <!-- Status -->
+
+                                    <td>
+
+                                        @if (application.Status == "Applied")
+                                        {
+                                            <span class="badge bg-success">
+
+                                                ✓ Applied
+
+                                            </span>
+                                        }
+                                        else if (application.Status == "Draft")
+                                        {
+                                            <span class="badge bg-secondary">
+
+                                                Draft
+
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-primary">
+
+                                                @application.Status
+
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- Updated -->
+
+                                    <td>
+
+                                        <small>
+
+                                            @application.UpdatedAt
+                                            .ToLocalTime()
+                                            .ToString("dd MMM yyyy HH:mm")
+
+                                        </small>
+
+                                    </td>
+
+
+                                    <!-- Actions -->
+
+                                    <td class="pe-4">
+
+                                        <div class="d-flex
+                                                            justify-content-end
+                                                            gap-2">
+
+                                            <!-- View Application -->
+
+                                            <a asp-controller="Applications"
+                                               asp-action="Details"
+                                               asp-route-id="@application.Id"
+                                               class="btn btn-sm
+                                                              btn-outline-primary">
+
+                                                View
+
+                                            </a>
+
+
+                                            <!-- Original Job -->
+                                            @if (!string.IsNullOrWhiteSpace(
+                                                                                application.Job?.SourceUrl))
+                                            {
+                                                @if (application.Status == "Applied")
+                                                {
+                                                    <a href="@application.Job.SourceUrl"
+                                                       target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       class="btn btn-sm btn-success">
+
+                                                        Applied ↗
+
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@application.Job.SourceUrl"
+                                                       target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       class="btn btn-sm btn-outline-success">
+
+                                                        Job ↗
+
+                                                    </a>
+                                                }
+                                            }
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

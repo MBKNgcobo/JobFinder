@@ -1,0 +1,242 @@
+﻿@model JobFinder.Models.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h1 class="fw-bold mb-1">My Profile</h1>
+        <p class="text-muted mb-0">
+            Manage the skills and portfolio evidence used by the JobFinder agents.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Candidate information -->
+        <div class="col-lg-5">
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Candidate Information</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted">
+                            Name
+                        </label>
+
+                        <div class="fw-semibold">
+                            @Model.FirstName @Model.LastName
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted">
+                            Email
+                        </label>
+
+                        <div>
+                            @Model.Email
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted">
+                            Years of Experience
+                        </label>
+
+                        <div class="fw-semibold">
+                            @Model.YearsOfExperience
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label text-muted">
+                            Professional Summary
+                        </label>
+
+                        <p class="mb-0">
+                            @(string.IsNullOrWhiteSpace(Model.Summary)
+                                                        ? "No professional summary added yet."
+                                                        : Model.Summary)
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-white d-flex justify-content-between">
+                    <h5 class="mb-0">Skills</h5>
+
+                    <span class="badge bg-primary">
+                        @Model.Skills.Count
+                    </span>
+                </div>
+
+                <div class="card-body">
+
+                    @if (Model.Skills.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2">
+
+                            @foreach (var skill in Model.Skills)
+                            {
+                                <span class="badge text-bg-light border px-3 py-2">
+                                    @skill
+                                </span>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">
+                            No skills have been added yet.
+                        </p>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Portfolio -->
+        <div class="col-lg-7">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <h5 class="mb-0">Portfolio Projects</h5>
+                        <small class="text-muted">
+                            Projects provide evidence for job applications.
+                        </small>
+                    </div>
+
+                    <span class="badge bg-primary">
+                        @Model.Projects.Count
+                    </span>
+
+                </div>
+
+                <div class="card-body">
+
+                    @if (Model.Projects.Any())
+                    {
+                        <div class="d-flex flex-column gap-3">
+
+                            @foreach (var project in Model.Projects)
+                            {
+                                <div class="border rounded p-3">
+
+                                    <div class="d-flex justify-content-between align-items-start">
+
+                                        <div>
+                                            <h5 class="mb-1">
+                                                @project.Name
+                                            </h5>
+
+                                            @if (!string.IsNullOrWhiteSpace(project.Description))
+                                            {
+                                                <p class="text-muted mb-2">
+                                                    @project.Description
+                                                </p>
+                                            }
+                                        </div>
+
+                                    </div>
+
+                                    @if (project.Skills.Any())
+                                    {
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+
+                                            @foreach (var skill in project.Skills)
+                                            {
+                                                <span class="badge text-bg-light border">
+                                                    @skill
+                                                </span>
+                                            }
+
+                                        </div>
+                                    }
+
+                                    <div class="d-flex gap-2">
+
+                                        @if (!string.IsNullOrWhiteSpace(project.GitHubUrl))
+                                        {
+                                            <a href="@project.GitHubUrl"
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               class="btn btn-sm btn-outline-dark">
+                                                GitHub ↗
+                                            </a>
+                                        }
+
+                                        @if (!string.IsNullOrWhiteSpace(project.LiveUrl))
+                                        {
+                                            <a href="@project.LiveUrl"
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               class="btn btn-sm btn-outline-primary">
+                                                Live Demo ↗
+                                            </a>
+                                        }
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+
+                            <h5>No portfolio projects yet</h5>
+
+                            <p class="text-muted">
+                                Add projects so the AI agents can use them as
+                                evidence when preparing applications.
+                            </p>
+
+                            <a asp-controller="Projects"
+                               asp-action="Index"
+                               class="btn btn-primary">
+                                Manage Projects
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="mt-4">
+        <a asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+
+        <a asp-controller="Projects"
+           asp-action="Index"
+           class="btn btn-primary">
+            Manage Projects
+        </a>
+    </div>
+
+</div>
