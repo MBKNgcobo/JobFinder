@@ -195,9 +195,7 @@
                     </small>
 
                     <strong>
-                        @Model.UpdatedAt
-                        .ToLocalTime()
-                        .ToString("dd MMM yyyy HH:mm")
+                        @(Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm"))
                     </strong>
 
                 </div>

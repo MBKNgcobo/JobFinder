@@ -1,8 +1,250 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Find your next opportunity";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="template-hero">
+
+    <div class="container">
+
+        <div class="hero-inner">
+
+            <div class="hero-label">
+                Intelligent Job Discovery
+            </div>
+
+
+            <h1 class="template-heading">
+
+                Find work that
+
+                <span class="highlight-word">
+                    fits
+                </span>
+
+                your future.
+
+            </h1>
+
+
+            <p class="template-description">
+
+                Discover opportunities that match your skills,
+                understand your fit, and prepare stronger
+                applications from one place.
+
+            </p>
+
+
+            <div class="hero-actions">
+
+                <a asp-controller="Jobs"
+                   asp-action="Index"
+                   class="template-primary-btn">
+
+                    Explore Jobs
+
+                    <span>→</span>
+
+                </a>
+
+
+                <a asp-controller="Dashboard"
+                   asp-action="Index"
+                   class="template-secondary-btn">
+
+                    View Dashboard
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- subtle background wireframe -->
+
+        <div class="hero-wireframe">
+
+            <div class="wireframe-column">
+
+                <div class="wireframe-box"></div>
+
+                <div class="wireframe-line short"></div>
+
+                <div class="wireframe-line"></div>
+
+                <div class="wireframe-line medium"></div>
+
+            </div>
+
+
+            <div class="wireframe-column central">
+
+                <div class="wireframe-title">
+                    Job Match
+                </div>
+
+                <div class="wireframe-score">
+                    87%
+                </div>
+
+                <div class="wireframe-line"></div>
+
+                <div class="wireframe-tags">
+
+                    <span>C#</span>
+                    <span>SQL</span>
+                    <span>Docker</span>
+
+                </div>
+
+            </div>
+
+
+            <div class="wireframe-column">
+
+                <div class="wireframe-box"></div>
+
+                <div class="wireframe-line"></div>
+
+                <div class="wireframe-line medium"></div>
+
+                <div class="wireframe-line short"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="features-section">
+
+    <div class="container">
+
+        <div class="section-intro">
+
+            <div class="section-label">
+                Everything in one place
+            </div>
+
+            <h2>
+                From job discovery
+                to application.
+            </h2>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+
+            <article class="template-feature-card">
+
+                <div class="feature-number">
+                    01
+                </div>
+
+                <div class="feature-icon">
+                    ⌕
+                </div>
+
+                <h3>
+                    Discover opportunities
+                </h3>
+
+                <p>
+                    Search relevant roles and find opportunities
+                    based on your skills and preferences.
+                </p>
+
+            </article>
+
+
+            <article class="template-feature-card">
+
+                <div class="feature-number">
+                    02
+                </div>
+
+                <div class="feature-icon">
+                    ◇
+                </div>
+
+                <h3>
+                    Understand your match
+                </h3>
+
+                <p>
+                    See how your skills compare with each role
+                    before deciding where to apply.
+                </p>
+
+            </article>
+
+
+            <article class="template-feature-card">
+
+                <div class="feature-number">
+                    03
+                </div>
+
+                <div class="feature-icon">
+                    ↗
+                </div>
+
+                <h3>
+                    Build your application
+                </h3>
+
+                <p>
+                    Prepare job-specific applications using
+                    your skills, projects and experience.
+                </p>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="final-section">
+
+    <div class="container">
+
+        <div class="final-card">
+
+            <div>
+
+                <div class="section-label">
+                    Ready when you are
+                </div>
+
+                <h2>
+                    Your next opportunity
+                    starts here.
+                </h2>
+
+            </div>
+
+
+            <a asp-controller="Jobs"
+               asp-action="Index"
+               class="template-primary-btn">
+
+                Start Exploring
+
+                <span>→</span>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
