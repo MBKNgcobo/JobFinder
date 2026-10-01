@@ -13,7 +13,9 @@ namespace JobFinder.Services.Interfaces
 
         Task<Job?> GetJobByIdAsync(int id);
 
-        Task<Job> CreateJobAsync(Job job);
+        Task<Job> CreateJobAsync(
+            Job job,
+            string companyName);
 
         Task<bool> UpdateJobAsync(Job job);
 

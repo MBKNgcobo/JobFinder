@@ -37,7 +37,7 @@ namespace JobFinder.Models
         public int CompanyId { get; set; }
 
         // Relationships
-        public Company Company { get; set; } = null!;
+        public Company? Company { get; set; }
 
         public ICollection<JobSkill> JobSkills { get; set; } = new List<JobSkill>();
 

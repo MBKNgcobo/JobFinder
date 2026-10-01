@@ -38,24 +38,26 @@
 
 
                 <div class="jobfinder-links">
+                    @{
+                        var currentController =
+                        ViewContext.RouteData.Values["controller"]?.ToString();
+                    }
 
                     <a asp-controller="Home"
-                       asp-action="Index">
+                       asp-action="Index"
+                       class="nav-pill @(currentController == "Home" ? "active" : "")">
                         Home
                     </a>
 
-                    <a asp-controller="Dashboard"
-                       asp-action="Index">
-                        Dashboard
-                    </a>
-
                     <a asp-controller="Jobs"
-                       asp-action="Index">
+                       asp-action="Index"
+                       class="nav-pill @(currentController == "Jobs" ? "active" : "")">
                         Jobs
                     </a>
 
                     <a asp-controller="Applications"
-                       asp-action="Index">
+                       asp-action="Index"
+                       class="nav-pill @(currentController == "Applications" ? "active" : "")">
                         Applications
                     </a>
 

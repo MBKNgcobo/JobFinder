@@ -169,11 +169,7 @@
 
                                     <!-- UPDATED -->
                                     <td>
-                                        <span class="text-muted">
-                                            @application.UpdatedAt
-                                            .ToLocalTime()
-                                            .ToString("dd MMM yyyy")
-                                        </span>
+                                        @(application.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy"))
                                     </td>
 
                                     <!-- ACTIONS -->

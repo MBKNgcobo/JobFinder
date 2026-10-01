@@ -27,10 +27,6 @@ namespace JobFinder.Services
                     .ThenInclude(js => js.Skill)
                 .AsQueryable();
 
-            // --------------------------------------------------------
-            // Keyword search
-            // --------------------------------------------------------
-
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var keyword = search.Trim();
@@ -42,10 +38,6 @@ namespace JobFinder.Services
                      j.Company.Name.Contains(keyword)));
             }
 
-            // --------------------------------------------------------
-            // Location filter
-            // --------------------------------------------------------
-
             if (!string.IsNullOrWhiteSpace(location))
             {
                 var selectedLocation = location.Trim();
@@ -55,10 +47,6 @@ namespace JobFinder.Services
                     j.Location.Contains(selectedLocation));
             }
 
-            // --------------------------------------------------------
-            // Source filter
-            // --------------------------------------------------------
-
             if (!string.IsNullOrWhiteSpace(source))
             {
                 var selectedSource = source.Trim();
@@ -67,18 +55,6 @@ namespace JobFinder.Services
                     j.Source != null &&
                     j.Source.Contains(selectedSource));
             }
-
-            // --------------------------------------------------------
-            // Match-score filter
-            // --------------------------------------------------------
-            //
-            // MatchScore belongs to JobMatch, which is user-specific.
-            //
-            // Therefore:
-            // Job -> JobMatch -> User
-            //
-            // We only consider the logged-in user's match.
-            //
 
             if (minMatchScore.HasValue)
             {
@@ -97,10 +73,6 @@ namespace JobFinder.Services
                             match.MatchScore >= score));
             }
 
-            // --------------------------------------------------------
-            // Ordering
-            // --------------------------------------------------------
-
             return await query
                 .OrderByDescending(j => j.PostedDate)
                 .ToListAsync();
@@ -115,8 +87,31 @@ namespace JobFinder.Services
                 .FirstOrDefaultAsync(j => j.Id == id);
         }
 
-        public async Task<Job> CreateJobAsync(Job job)
+        public async Task<Job> CreateJobAsync(
+            Job job,
+            string companyName)
         {
+            var normalizedCompanyName = companyName.Trim();
+
+            var company = await _context.Companies
+                .FirstOrDefaultAsync(c =>
+                    c.Name.ToLower() ==
+                    normalizedCompanyName.ToLower());
+
+            if (company == null)
+            {
+                company = new Company
+                {
+                    Name = normalizedCompanyName
+                };
+
+                _context.Companies.Add(company);
+
+                await _context.SaveChangesAsync();
+            }
+
+            job.CompanyId = company.Id;
+
             _context.Jobs.Add(job);
 
             await _context.SaveChangesAsync();
@@ -126,7 +121,8 @@ namespace JobFinder.Services
 
         public async Task<bool> UpdateJobAsync(Job job)
         {
-            var existingJob = await _context.Jobs.FindAsync(job.Id);
+            var existingJob = await _context.Jobs
+                .FindAsync(job.Id);
 
             if (existingJob == null)
             {
@@ -152,7 +148,8 @@ namespace JobFinder.Services
 
         public async Task<bool> DeleteJobAsync(int id)
         {
-            var job = await _context.Jobs.FindAsync(id);
+            var job = await _context.Jobs
+                .FindAsync(id);
 
             if (job == null)
             {

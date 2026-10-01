@@ -1296,3 +1296,26 @@ textarea:focus-visible {
         font-size: 2rem;
     }
 }
+
+.nav-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #ffffff;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+    .nav-pill:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-pill.active {
+        color: var(--green);
+        background: #ffffff;
+    }   
