@@ -210,9 +210,7 @@
                     @if (Model.AppliedAt.HasValue)
                     {
                         <strong>
-                            @Model.AppliedAt.Value
-                            .ToLocalTime()
-                            .ToString("dd MMM yyyy HH:mm")
+                            @Model.AppliedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")
                         </strong>
                     }
                     else
@@ -483,9 +481,7 @@
                 {
                     <div class="text-muted small">
                         Generated on
-                        @Model.GeneratedAt.Value
-                        .ToLocalTime()
-                        .ToString("dd MMM yyyy HH:mm")
+                        @Model.GeneratedAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")
                     </div>
                 }
 
@@ -566,10 +562,7 @@
                                 <div class="small text-muted">
 
                                     Created
-                                    @document.CreatedAt
-                                    .ToLocalTime()
-                                    .ToString(
-                                    "dd MMM yyyy HH:mm")
+                                    @document.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")
 
                                 </div>
 
@@ -630,10 +623,7 @@
                             <small>
 
                                 Applied on
-                                @Model.AppliedAt.Value
-                                .ToLocalTime()
-                                .ToString(
-                                "dd MMMM yyyy HH:mm")
+                                @Model.AppliedAt.Value.ToLocalTime().ToString("dd MMMM yyyy HH:mm")
 
                             </small>
                         }
