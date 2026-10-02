@@ -1,10 +1,15 @@
 ﻿using JobFinder.Data;
 using JobFinder.Models;
+using JobFinder.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobFinder.Controllers
 {
+    // Shared reference data. Any authenticated user may browse
+    // skills, but only an administrator may change them.
+    [Authorize]
     public class SkillsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -42,6 +47,7 @@ namespace JobFinder.Controllers
         }
 
         // POST: Skills/Create
+        [Authorize(Roles = AppRoles.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Skill skill)

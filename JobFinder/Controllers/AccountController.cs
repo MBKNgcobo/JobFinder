@@ -1,6 +1,7 @@
 ﻿using JobFinder.Data;
 using JobFinder.Models;
 using JobFinder.Models.ViewModels;
+using JobFinder.Security;
 using JobFinder.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -72,20 +73,7 @@ namespace JobFinder.Controllers
                 return View(model);
             }
 
-            var claims = new List<Claim>
-            {
-                new Claim(
-                    ClaimTypes.NameIdentifier,
-                    user.Id.ToString()),
-
-                new Claim(
-                    ClaimTypes.Name,
-                    $"{user.FirstName} {user.LastName}"),
-
-                new Claim(
-                    ClaimTypes.Email,
-                    user.Email)
-            };
+            var claims = BuildClaims(user);
 
             var identity = new ClaimsIdentity(
                 claims,
@@ -180,6 +168,21 @@ namespace JobFinder.Controllers
 
         private async Task SignInUser(User user)
         {
+            var claims = BuildClaims(user);
+
+            var identity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal);
+        }
+
+        private static List<Claim> BuildClaims(User user)
+        {
             var claims = new List<Claim>
             {
                 new Claim(
@@ -195,15 +198,16 @@ namespace JobFinder.Controllers
                     user.Email)
             };
 
-            var identity = new ClaimsIdentity(
-                claims,
-                CookieAuthenticationDefaults.AuthenticationScheme);
+            // Role claims drive [Authorize(Roles = ...)] checks.
+            if (user.IsAdmin)
+            {
+                claims.Add(
+                    new Claim(
+                        ClaimTypes.Role,
+                        AppRoles.Admin));
+            }
 
-            var principal = new ClaimsPrincipal(identity);
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal);
+            return claims;
         }
     }
 }

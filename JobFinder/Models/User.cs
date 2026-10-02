@@ -22,6 +22,12 @@ namespace JobFinder.Models
         [Required]
         public string PasswordHash { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Grants administrative access to shared reference data
+        /// (companies and skills) and to every user-owned record.
+        /// </summary>
+        public bool IsAdmin { get; set; }
+
         [MaxLength(20)]
         public string? Phone { get; set; }
 

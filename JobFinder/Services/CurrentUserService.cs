@@ -1,4 +1,5 @@
-﻿using JobFinder.Services.Interfaces;
+﻿using JobFinder.Security;
+using JobFinder.Services.Interfaces;
 using System.Security.Claims;
 
 namespace JobFinder.Services
@@ -29,5 +30,10 @@ namespace JobFinder.Services
                 return 0;
             }
         }
+
+        public bool IsAdmin =>
+            _httpContextAccessor.HttpContext?
+                .User?
+                .IsInRole(AppRoles.Admin) == true;
     }
 }

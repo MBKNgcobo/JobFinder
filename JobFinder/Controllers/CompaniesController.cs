@@ -1,10 +1,15 @@
 ﻿using JobFinder.Data;
 using JobFinder.Models;
+using JobFinder.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobFinder.Controllers
 {
+    // Shared reference data. Any authenticated user may browse
+    // companies, but only an administrator may change them.
+    [Authorize]
     public class CompaniesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -41,12 +46,14 @@ namespace JobFinder.Controllers
         }
 
         // GET: Companies/Create
+        [Authorize(Roles = AppRoles.Admin)]
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Companies/Create
+        [Authorize(Roles = AppRoles.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Company company)
@@ -61,6 +68,7 @@ namespace JobFinder.Controllers
         }
 
         // GET: Companies/Edit/5
+        [Authorize(Roles = AppRoles.Admin)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -75,6 +83,7 @@ namespace JobFinder.Controllers
         }
 
         // POST: Companies/Edit/5
+        [Authorize(Roles = AppRoles.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Company company)
@@ -92,6 +101,7 @@ namespace JobFinder.Controllers
         }
 
         // POST: Companies/Delete/5
+        [Authorize(Roles = AppRoles.Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)

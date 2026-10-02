@@ -17,9 +17,6 @@
         <input type="hidden"
                asp-for="Id" />
 
-        <input type="hidden"
-               asp-for="UserId" />
-
         <div asp-validation-summary="ModelOnly"
              class="text-danger mb-3">
         </div>
@@ -138,7 +135,6 @@
             </button>
 
             <a asp-action="Index"
-               asp-route-userId="@Model.UserId"
                class="btn btn-secondary">
                 Cancel
             </a>

@@ -311,12 +311,25 @@ The project uses:
 
 * Password hashing
 * Cookie authentication
-* Authenticated-user ownership checks
 * `[Authorize]` protected controllers
+* Owner-or-admin authorization on user-owned records (projects)
+* Role-based authorization on shared reference data: companies and skills can only be created, edited, or deleted by the `Admin` role
 * Anti-forgery tokens on state-changing MVC forms
 * Environment-based secrets (database credentials are not stored in source)
 * PostgreSQL and FastAPI bound to the Compose network only (not published to the host)
 * Validation through MVC models and FastAPI/Pydantic request schemas
+
+### Administrator role
+
+Projects are bound to the signed-in user; every other user-owned record follows the same owner-or-admin rule. Companies and skills are shared reference data, so they can only be created, edited, or deleted by an administrator.
+
+An administrator is an ordinary account whose `Users."IsAdmin"` column is `true`. The flag is converted into an `Admin` role claim when the user signs in, and that claim is what `[Authorize(Roles = "Admin")]` checks. To promote an existing account:
+
+```sql
+UPDATE "Users" SET "IsAdmin" = TRUE WHERE "Email" = 'admin@example.com';
+```
+
+The user must sign in again before the new role claim is present in the authentication cookie.
 
 Production deployments would additionally require deployment-specific secret management, HTTPS, service-to-service authentication, rate limiting, and centralized logging.
 
