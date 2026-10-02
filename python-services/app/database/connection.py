@@ -6,10 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://jobfinder:jobfinder@db:5432/jobfinder",
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not configured.")
 
 # Support SQLAlchemy-style URLs if DATABASE_URL is currently using one.
 if DATABASE_URL.startswith("postgresql+psycopg2://"):

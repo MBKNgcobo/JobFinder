@@ -6,12 +6,9 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: jobfinder
-      POSTGRES_USER: jobfinder
-      POSTGRES_PASSWORD: jobfinder_dev_password
-
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
 
     volumes:
       - jobfinder_postgres_data:/var/lib/postgresql
@@ -20,7 +17,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U jobfinder -d jobfinder"
+          "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
         ]
       interval: 5s
       timeout: 5s
@@ -40,10 +37,7 @@ services:
       - ./python-services/.env
 
     environment:
-      DATABASE_URL: postgresql://jobfinder:jobfinder_dev_password@db:5432/jobfinder
-
-    ports:
-      - "8000:8000"
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
 
     depends_on:
       db:
@@ -75,7 +69,7 @@ services:
       - ./python-services/.env
 
     environment:
-      DATABASE_URL: postgresql://jobfinder:jobfinder_dev_password@db:5432/jobfinder
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       SCRAPER_INTERVAL_MINUTES: 360
 
     depends_on:
@@ -96,7 +90,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=jobfinder;Username=jobfinder;Password=jobfinder_dev_password"
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       Services__PythonApiBaseUrl: "http://api:8000/"
 
     ports:

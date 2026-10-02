@@ -202,13 +202,20 @@ JobFinder/
 
 ### Configuration
 
-Copy the example environment file and provide your local values.
+Copy the example environment files and provide local values. Do not commit `.env`.
 
 ```powershell
 cp .env.example .env
+cp python-services/.env.example python-services/.env
 ```
 
-Set the required values, including the OpenRouter API key.
+Set `POSTGRES_PASSWORD` to a new local secret (not a password that has ever been committed). Set the OpenRouter API key in `python-services/.env`.
+
+Postgres stores its role password in the data volume. After rotating `POSTGRES_PASSWORD`, recreate the volume once:
+
+```powershell
+docker compose down -v
+```
 
 ### Start the application
 
@@ -218,19 +225,13 @@ From the repository root:
 docker compose up --build
 ```
 
-The application is exposed through:
+The web application is the only service published on the host:
 
 ```text
 http://localhost:7176
 ```
 
-FastAPI is exposed through:
-
-```text
-http://localhost:8000
-```
-
-The PostgreSQL database runs inside the Compose network.
+PostgreSQL and FastAPI listen only on the Compose network (`db:5432`, `api:8000`). They are not published to localhost.
 
 ### Stop the application
 
@@ -313,7 +314,8 @@ The project uses:
 * Authenticated-user ownership checks
 * `[Authorize]` protected controllers
 * Anti-forgery tokens on state-changing MVC forms
-* Environment-based secrets
+* Environment-based secrets (database credentials are not stored in source)
+* PostgreSQL and FastAPI bound to the Compose network only (not published to the host)
 * Validation through MVC models and FastAPI/Pydantic request schemas
 
 Production deployments would additionally require deployment-specific secret management, HTTPS, service-to-service authentication, rate limiting, and centralized logging.
