@@ -10,6 +10,15 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<!-- T1: test project lives under the web folder; keep its
+		     sources out of the app build (SDK default glob). -->
+		<Compile Remove="JobFinder.Tests/**/*.cs" />
+		<Content Remove="JobFinder.Tests/**/*" />
+		<EmbeddedResource Remove="JobFinder.Tests/**/*" />
+		<None Remove="JobFinder.Tests/**/*" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
 		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.2" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />

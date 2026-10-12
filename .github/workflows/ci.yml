@@ -1,0 +1,77 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dotnet:
+    name: dotnet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore JobFinder/JobFinder.sln
+
+      - name: Build
+        run: >
+          dotnet build JobFinder/JobFinder.sln
+          --no-restore --configuration Release
+
+      # Report-only coverage: collected, no threshold gate (T1).
+      - name: Test
+        run: >
+          dotnet test JobFinder/JobFinder.sln --no-build
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+
+  python:
+    name: python
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: jobfinder_test
+          POSTGRES_USER: jobfinder_test
+          POSTGRES_PASSWORD: jobfinder_test
+        options: >-
+          --health-cmd "pg_isready -U jobfinder_test -d jobfinder_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: postgresql://jobfinder_test:jobfinder_test@localhost:5432/jobfinder_test
+
+    defaults:
+      run:
+        working-directory: python-services
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # No live network: the suite stubs the LLM boundary.
+      # Report-only coverage: collected, no threshold gate (T1).
+      - name: Test
+        run: pytest --cov=app --cov-report=term --cov-report=xml

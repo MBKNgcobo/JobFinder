@@ -72,13 +72,16 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var db =
-        scope.ServiceProvider
-            .GetRequiredService<ApplicationDbContext>();
+    using (var scope = app.Services.CreateScope())
+    {
+        var db =
+            scope.ServiceProvider
+                .GetRequiredService<ApplicationDbContext>();
 
-    db.Database.Migrate();
+        db.Database.Migrate();
+    }
 }
 
 if (!app.Environment.IsDevelopment())
@@ -102,3 +105,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+// Exposes the entry point to the test project so
+// WebApplicationFactory can boot the real pipeline.
+public partial class Program { }
